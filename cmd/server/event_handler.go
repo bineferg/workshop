@@ -18,19 +18,17 @@ type EventHandler struct {
 type EventListResponse struct {
 	Events []Event `json:"events"`
 }
-
 type Event struct {
+	Name        string `json:"name"`
 	Description string `json:"description"`
 	Time        string `json:"time"`
 	Cost        int    `json:"cost"`
-	Cap         int    `json:"person_cap"`
 }
 
 func createEvent(description string) Event {
 	defaultTime := time.Now()
 	defaultCost := 5
-	defaultCap := 15
-	return Event{Description: description, Time: fmt.Sprintf("%v", defaultTime), Cost: defaultCost, Cap: defaultCap}
+	return Event{Description: description, Time: fmt.Sprintf("%v", defaultTime), Cost: defaultCost}
 }
 
 func (h EventHandler) GetEvents(w http.ResponseWriter, r *http.Request) error {

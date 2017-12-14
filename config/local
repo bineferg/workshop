@@ -1,4 +1,4 @@
-MYSQL_DNS="root:root_pw@tcp(mysql:3306)/workshop?timeout=5s&strict=true&sql_notes=false&parseTime=true"
+MYSQL_DNS="root@tcp(localhost:3306)/workshop?timeout=5s&parseTime=true"
 WORKSHOPS_TABLE=workshop.workshops
 EVENTS_TABLE=workshop.events
 SIGNUP_TABLE=workshop.signup
