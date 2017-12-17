@@ -1,55 +1,64 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"time"
+
+	"github.com/workshop/lib/repository"
+	"github.com/workshop/lib/workshop"
 )
 
 type EventHandler struct {
-	eventsList string
+	workshopRepo repository.WorkshopDB
 }
 
 type EventListResponse struct {
 	Events []Event `json:"events"`
 }
 type Event struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Time        string `json:"time"`
-	Cost        int    `json:"cost"`
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	StartTime   string  `json:"time"`
+	Cost        float64 `json:"cost"`
+	Location    string  `json:"location"`
 }
 
-func createEvent(description string) Event {
-	defaultTime := time.Now()
-	defaultCost := 5
-	return Event{Description: description, Time: fmt.Sprintf("%v", defaultTime), Cost: defaultCost}
+func createEvent(e Event) (workshop.Event, error) {
+	//TODO validate workshop entry later
+	return workshop.Event{
+		ID:          e.ID,
+		Name:        e.Name,
+		Description: e.Description,
+		StartTime:   time.Now(), //Deal e.th this later
+		Cost:        float64(e.Cost),
+		Location:    e.Location,
+	}, nil
 }
 
 func (h EventHandler) GetEvents(w http.ResponseWriter, r *http.Request) error {
-	file, err := os.Open(h.eventsList)
+
+	today := time.Now()
+	events, err := h.workshopRepo.GetEventsAfterDate(today)
 	if err != nil {
-		log.Printf(err.Error())
-		return err
+		return nil
 	}
-	defer file.Close()
-	var events []Event
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		events = append(events, createEvent(scanner.Text()))
+	var eResp []Event
+	for _, e := range events {
+		eResp = append(eResp, Event{
+			ID:          e.ID,
+			Name:        e.Name,
+			Description: e.Description,
+			StartTime:   fmt.Sprintf("%v", e.StartTime),
+			Cost:        e.Cost,
+			Location:    e.Location,
+		})
 	}
-
-	if err := scanner.Err(); err != nil {
-		log.Printf(err.Error())
-		return err
-	}
-
-	resp := EventListResponse{Events: events}
+	resp := EventListResponse{Events: eResp}
 	json.NewEncoder(w).Encode(resp)
 
 	return nil
@@ -62,7 +71,11 @@ func (h EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) error 
 		return err
 	}
 	defer r.Body.Close()
-	log.Printf("event created %v", event)
+	e, _ := createEvent(event)
+	if err := h.workshopRepo.InsertEvent(e); err != nil {
+		return err
+	}
+	log.Printf("event created %v", e)
 	io.WriteString(w, "OK")
 	return nil
 
