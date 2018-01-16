@@ -1,6 +1,17 @@
 # Workshop - backend
 
-A collection of endpoints to power ~~ workshop ~~
+A collection of endpoints to power ~~ workshop website ~~
+
+## Requirements
+-MySql 5.6.x >
+-go version go1.7.4
+
+## Install
+
+`git clone git@github.com:bineferg/workshop.git`
+`cd workshop`
+`make build`
+`make workshop`
 
 ## Endpoints
 

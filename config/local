@@ -1,5 +1,7 @@
-MYSQL_DNS="root@tcp(localhost:3306)/workshop?timeout=5s&parseTime=true"
+MYSQL_DNS="workshop_rwx:workshop@tcp(workshop-db.cpucv6eyozgt.us-east-2.rds.amazonaws.com:3306)/workshop?timeout=5s&parseTime=true"
 WORKSHOPS_TABLE=workshop.workshops
 EVENTS_TABLE=workshop.events
 SIGNUP_TABLE=workshop.signup
 TEST_EVENTS=fixtures/events.txt
+MYSQL_USERNAME=workshop_rwx
+MYSQL_PASSWORD=workshop
