@@ -30,6 +30,10 @@ type Event struct {
 
 func createEvent(e Event) (workshop.Event, error) {
 	//TODO validate workshop entry later
+	t, err := time.Parse(time.RFC3339, e.StartTime)
+        if err !=nil {
+                log.Printf("invalid date!")
+        }
 	return workshop.Event{
 		ID:          e.ID,
 		Name:        e.Name,
