@@ -38,7 +38,7 @@ func createEvent(e Event) (workshop.Event, error) {
 		ID:          e.ID,
 		Name:        e.Name,
 		Description: e.Description,
-		StartTime:   time.Now(), //Deal e.th this later
+		StartTime:   t, //Deal e.th this later
 		Cost:        float64(e.Cost),
 		Location:    e.Location,
 	}, nil

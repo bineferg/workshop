@@ -20,6 +20,7 @@ type WorkshopDB interface {
 	EventByID(eventID string) (workshop.Event, error)
 	SignUp(signup workshop.SignUp) error
 	GetSignUpsByWorkshopID(workshopID string) ([]workshop.SignUp, error)
+	GetNumSignUpsByWorkshopID(workshopID string) (int, error)
 
 	GetDB() interface{}
 }
@@ -173,6 +174,15 @@ func (w workshopDB) GetWorkshopsAfterDate(date time.Time) ([]workshop.Workshop, 
 		workshops = append(workshops, ws)
 
 	}
+	for _, wk := range workshops {
+		c, err := w.GetNumSignUpsByWorkshopID(wk.WorkshopID)
+		if err != nil {
+			return workshops, err
+		}
+		if wk.Cap == c {
+			wk.IsFull = true
+		}
+	}
 	return workshops, nil
 }
 
@@ -231,4 +241,20 @@ func (w workshopDB) GetSignUpsByWorkshopID(workshopID string) ([]workshop.SignUp
 
 	}
 	return signups, nil
+}
+func (w workshopDB) GetNumSignUpsByWorkshopID(workshopID string) (int, error) {
+	sqlCmd := "SELECT count(*) FROM signups WHERE workshop_id = ?"
+	var count int
+	rows, err := w.db.Query(sqlCmd, workshopID)
+	if err != nil {
+		return 0, err
+	}
+	for rows.Next() {
+		if err := rows.Scan(&count); err != nil {
+			return 0, err
+
+		}
+
+	}
+	return count, nil
 }

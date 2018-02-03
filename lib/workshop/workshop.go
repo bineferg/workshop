@@ -3,7 +3,7 @@ package workshop
 import "time"
 
 type Workshop struct {
-	WorkshopID          string
+	WorkshopID  string
 	Name        string
 	Description string
 	StartTime   time.Time
@@ -11,6 +11,7 @@ type Workshop struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	Cap         int
+	IsFull      bool
 	Cost        float64
 	Location    string
 	Level       string

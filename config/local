@@ -5,3 +5,4 @@ SIGNUP_TABLE=workshop.signup
 TEST_EVENTS=fixtures/events.txt
 MYSQL_USERNAME=workshop_rwx
 MYSQL_PASSWORD=workshop
+MYSQL_LOCAL_DNS="root@localhost:3306/workshop?timeout=5s"
