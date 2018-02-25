@@ -85,6 +85,31 @@ func (h EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) error 
 
 }
 
+func (h EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) error {
+	var event workshop.Event
+	err  := json.NewDecoder(r.Body).Decode(&event)
+	if err != nil {
+		return err
+	}	
+	defer r.Body.Close()
+	if err = h.workshopRepo.UpdateEvent(event); err != nil {
+		return err
+	}
+	io.WriteString(w, "OK")
+	return nil
+
+}
+
+func (h EventHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) error {
+	v := r.URL.Query()
+	eventID := v.Get("event_id")
+	if err := h.workshopRepo.DeleteEvent(eventID); err != nil {
+		return err
+	}
+	return nil
+
+}
+
 func (h EventHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
@@ -99,6 +124,16 @@ func (h EventHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
+	case "PUT":
+		err := h.UpdateEvent(w,r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	case "DELETE":
+		err := h.DeleteEvent(w,r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	default:
 		http.Error(w, "not a valid request", http.StatusBadRequest)
 	}

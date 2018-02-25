@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -13,9 +14,12 @@ type WorkshopDB interface {
 	WorkshopByID(workshopID string) (workshop.Workshop, error)
 	InsertWorkshop(workshop.Workshop) error
 	GetWorkshopsAfterDate(date time.Time) ([]workshop.Workshop, error)
+	GetWorkshops() ([]workshop.Workshop, error)
 	UpdateWorkshop(workshop workshop.Workshop) error
+	DeleteWorkshop(workshopID string) error
 	GetEventsAfterDate(date time.Time) ([]workshop.Event, error)
 	InsertEvent(event workshop.Event) error
+	DeleteEvent(eventID string) error
 	UpdateEvent(event workshop.Event) error
 	EventByID(eventID string) (workshop.Event, error)
 	SignUp(signup workshop.SignUp) error
@@ -75,6 +79,29 @@ func (w workshopDB) EventByID(eventID string) (workshop.Event, error) {
 	return e, nil
 }
 
+func (w workshopDB) DeleteEvent(eventID string) error {
+	stmt, err := w.db.Prepare("DELETE from events where event_id=?")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(eventID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (w workshopDB) DeleteWorkshop(workshopID string) error {
+	stmt, err := w.db.Prepare("DELETE from workshops where workshop_id=?")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(workshopID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func (w workshopDB) InsertWorkshop(ws workshop.Workshop) error {
 
 	sqlCmd := "INSERT INTO workshops (workshop_id, name, description, start_time, end_time, created_at, updated_at, cap, cost, location, level) VALUES (?,?,?,?,?,NOW(),NOW(),?,?,?,?)"
@@ -174,13 +201,44 @@ func (w workshopDB) GetWorkshopsAfterDate(date time.Time) ([]workshop.Workshop, 
 		workshops = append(workshops, ws)
 
 	}
-	for _, wk := range workshops {
-		c, err := w.GetNumSignUpsByWorkshopID(wk.WorkshopID)
+	for index, _ := range workshops {
+		c, err := w.GetNumSignUpsByWorkshopID(workshops[index].WorkshopID)
 		if err != nil {
 			return workshops, err
 		}
-		if wk.Cap == c {
-			wk.IsFull = true
+		if workshops[index].Cap == c {
+			workshops[index].IsFull = true
+		}
+	}
+	return workshops, nil
+}
+
+func (w workshopDB) GetWorkshops() ([]workshop.Workshop, error) {
+	sqlCmd := "SELECT * FROM workshops"
+	var workshops []workshop.Workshop
+	rows, err := w.db.Query(
+		sqlCmd,
+	)
+	if err != nil {
+		return workshops, err
+	}
+	var id int
+	for rows.Next() {
+		var ws workshop.Workshop
+		err := rows.Scan(&id, &ws.WorkshopID, &ws.Name, &ws.Description, &ws.StartTime, &ws.EndTime, &ws.CreatedAt, &ws.UpdatedAt, &ws.Cap, &ws.Cost, &ws.Location, &ws.Level)
+		if err != nil {
+			return workshops, err
+		}
+		workshops = append(workshops, ws)
+
+	}
+	for index, _ := range workshops {
+		c, err := w.GetNumSignUpsByWorkshopID(workshops[index].WorkshopID)
+		if err != nil {
+			return workshops, err
+		}
+		if workshops[index].Cap == c {
+			workshops[index].IsFull = true
 		}
 	}
 	return workshops, nil
@@ -210,6 +268,9 @@ func (w workshopDB) GetEventsAfterDate(date time.Time) ([]workshop.Event, error)
 }
 
 func (w workshopDB) SignUp(signup workshop.SignUp) error {
+	log.Println(signup.WorkshopID)
+	log.Println(signup.FirstName)
+	log.Println(signup.LastName)
 	sqlCmd := "INSERT INTO signups (workshop_id, first_name, last_name, email, created_at, updated_at) VALUES(?, ?, ?, ?, NOW(), NOW())"
 	if _, err := w.db.Exec(
 		sqlCmd,

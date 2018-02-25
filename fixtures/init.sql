@@ -52,7 +52,7 @@ CREATE TABLE workshop.signups (
 	created_at DATETIME,
 	updated_at DATETIME,
 	PRIMARY KEY(id),
-	FOREIGN KEY(workshop_id) REFERENCES workshops(workshop_id),
+	FOREIGN KEY(workshop_id) REFERENCES workshops(workshop_id) ON CASCADE DELETE,
 	INDEX(workshop_id),
 	CONSTRAINT name_email_workshop UNIQUE(first_name, workshop_id, email)
 ) engine=InnoDB;
