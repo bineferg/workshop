@@ -2,11 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/workshop/lib/repository"
 	"github.com/workshop/lib/workshop"
@@ -23,31 +21,26 @@ type Event struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
-	StartTime   string  `json:"time"`
-	Cost        float64 `json:"cost"`
+	Time   string  `json:"time"`
+	Cost        string `json:"cost"`
 	Location    string  `json:"location"`
 }
 
 func createEvent(e Event) (workshop.Event, error) {
 	//TODO validate workshop entry later
-	t, err := time.Parse(time.RFC3339, e.StartTime)
-        if err !=nil {
-                log.Printf("invalid date!")
-        }
 	return workshop.Event{
 		ID:          e.ID,
 		Name:        e.Name,
 		Description: e.Description,
-		StartTime:   t, //Deal e.th this later
-		Cost:        float64(e.Cost),
+		Time:   e.Time, //Deal e.th this later
+		Cost:        e.Cost,
 		Location:    e.Location,
 	}, nil
 }
 
 func (h EventHandler) GetEvents(w http.ResponseWriter, r *http.Request) error {
 
-	today := time.Now()
-	events, err := h.workshopRepo.GetEventsAfterDate(today)
+	events, err := h.workshopRepo.GetEvents()
 	if err != nil {
 		return nil
 	}
@@ -57,7 +50,7 @@ func (h EventHandler) GetEvents(w http.ResponseWriter, r *http.Request) error {
 			ID:          e.ID,
 			Name:        e.Name,
 			Description: e.Description,
-			StartTime:   fmt.Sprintf("%v", e.StartTime),
+			Time:   e.Time,
 			Cost:        e.Cost,
 			Location:    e.Location,
 		})

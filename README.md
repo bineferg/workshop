@@ -44,3 +44,5 @@ Accepts a json event struct to add a workshop to the db
 Updates an existing workshop
 
 
+###Other Info
+To alter DB ssh to ec2 instance, then use mysql utility with endpoint and u/p to make changes
