@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/workshop/lib/repository"
 	"github.com/workshop/lib/workshop"
@@ -18,12 +19,14 @@ type EventListResponse struct {
 	Events []Event `json:"events"`
 }
 type Event struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Time   string  `json:"time"`
-	Cost        string `json:"cost"`
-	Location    string  `json:"location"`
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Time        string    `json:"time"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	Cost        string    `json:"cost"`
+	Location    string    `json:"location"`
 }
 
 func createEvent(e Event) (workshop.Event, error) {
@@ -32,7 +35,7 @@ func createEvent(e Event) (workshop.Event, error) {
 		ID:          e.ID,
 		Name:        e.Name,
 		Description: e.Description,
-		Time:   e.Time, //Deal e.th this later
+		Time:        e.Time, //Deal e.th this later
 		Cost:        e.Cost,
 		Location:    e.Location,
 	}, nil
@@ -50,7 +53,9 @@ func (h EventHandler) GetEvents(w http.ResponseWriter, r *http.Request) error {
 			ID:          e.ID,
 			Name:        e.Name,
 			Description: e.Description,
-			Time:   e.Time,
+			CreatedAt:   e.CreatedAt,
+			UpdatedAt:   e.UpdatedAt,
+			Time:        e.Time,
 			Cost:        e.Cost,
 			Location:    e.Location,
 		})
@@ -80,10 +85,10 @@ func (h EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) error 
 
 func (h EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) error {
 	var event workshop.Event
-	err  := json.NewDecoder(r.Body).Decode(&event)
+	err := json.NewDecoder(r.Body).Decode(&event)
 	if err != nil {
 		return err
-	}	
+	}
 	defer r.Body.Close()
 	if err = h.workshopRepo.UpdateEvent(event); err != nil {
 		return err
@@ -118,12 +123,12 @@ func (h EventHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	case "PUT":
-		err := h.UpdateEvent(w,r)
+		err := h.UpdateEvent(w, r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	case "DELETE":
-		err := h.DeleteEvent(w,r)
+		err := h.DeleteEvent(w, r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}

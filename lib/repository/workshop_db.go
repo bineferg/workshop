@@ -105,7 +105,7 @@ func (w workshopDB) DeleteWorkshop(workshopID string) error {
 }
 func (w workshopDB) InsertWorkshop(ws workshop.Workshop) error {
 
-	sqlCmd := "INSERT INTO workshops (workshop_id, name, description, time, created_at, updated_at, cap, cost, location, level) VALUES (?,?,?,?,?,NOW(),NOW(),?,?,?,?)"
+	sqlCmd := "INSERT INTO workshops (workshop_id, name, description, time, created_at, updated_at, cap, cost, location, level) VALUES (?,?,?,?,NOW(),NOW(),?,?,?,?)"
 
 	if _, err := w.db.Exec(
 		sqlCmd,
@@ -222,7 +222,7 @@ func (w workshopDB) GetWorkshops() ([]workshop.Workshop, error) {
 	var id int
 	for rows.Next() {
 		var ws workshop.Workshop
-		err := rows.Scan(&id, &ws.WorkshopID, &ws.Name, &ws.Description, &ws.Time, &ws.CreatedAt, &ws.UpdatedAt, &ws.Cap, &ws.Cost, &ws.Location, &ws.Level)
+		err := rows.Scan(&id, &ws.WorkshopID, &ws.Name, &ws.Description, &ws.CreatedAt, &ws.UpdatedAt, &ws.Cap, &ws.Location, &ws.Level, &ws.Time, &ws.Cost)
 		if err != nil {
 			return workshops, err
 		}
@@ -252,7 +252,7 @@ func (w workshopDB) GetEvents() ([]workshop.Event, error) {
 	var id int
 	for rows.Next() {
 		var e workshop.Event
-		err := rows.Scan(&id, &e.ID, &e.Name, &e.Description, &e.Time, &e.UpdatedAt, &e.Cost, &e.Location)
+		err := rows.Scan(&id, &e.ID, &e.Name, &e.Description, &e.CreatedAt, &e.UpdatedAt, &e.Location, &e.Time, &e.Cost)
 		if err != nil {
 			return events, err
 		}
