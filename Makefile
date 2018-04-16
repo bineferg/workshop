@@ -20,7 +20,7 @@ local-workshop:
 	env $(shell cat config/local) MYSQL_DNS='root@/workshop?parseTime=true' ./server
 
 deploy:
-aws deploy create-deployment \
+	aws deploy create-deployment \
   --application-name Workshop \
   --deployment-config-name CodeDeployDefault.OneAtATime \
   --deployment-group-name Workshop-DepGrp \

@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"log"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -26,6 +25,7 @@ type WorkshopDB interface {
 	SignUp(signup workshop.SignUp) error
 	GetSignUpsByWorkshopID(workshopID string) ([]workshop.SignUp, error)
 	GetNumSignUpsByWorkshopID(workshopID string) (int, error)
+	GetAllSignUps() ([]workshop.SignUpTable, error)
 
 	GetDB() interface{}
 }
@@ -36,6 +36,22 @@ type workshopDB struct {
 
 func (w workshopDB) GetDB() interface{} {
 	return w.db
+}
+
+func transact(db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
+	tx, err := db.Begin()
+	if err != nil {
+		return
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+	err = txFunc(tx)
+	return err
 }
 
 func NewWorkshopDB(dns string) (*workshopDB, error) {
@@ -143,7 +159,6 @@ func (w workshopDB) InsertEvent(e workshop.Event) error {
 
 func (w workshopDB) UpdateWorkshop(ws workshop.Workshop) error {
 	sqlCmd := "UPDATE workshops SET name=?, description=?, time=?, cap=?, level=?, cost=?, location=? WHERE workshop_id=?"
-
 
 	if _, err := w.db.Exec(
 		sqlCmd,
@@ -286,16 +301,14 @@ func (w workshopDB) GetEventsAfterDate(date time.Time) ([]workshop.Event, error)
 }
 
 func (w workshopDB) SignUp(signup workshop.SignUp) error {
-	log.Println(signup.WorkshopID)
-	log.Println(signup.FirstName)
-	log.Println(signup.LastName)
-	sqlCmd := "INSERT INTO signups (workshop_id, first_name, last_name, email, created_at, updated_at) VALUES(?, ?, ?, ?, NOW(), NOW())"
+	sqlCmd := "INSERT INTO signups (workshop_id, first_name, last_name, email, message, created_at, updated_at) VALUES(?, ?, ?, ?,?, NOW(), NOW())"
 	if _, err := w.db.Exec(
 		sqlCmd,
 		signup.WorkshopID,
 		signup.FirstName,
 		signup.LastName,
 		signup.Email,
+		signup.Message,
 	); err != nil {
 		return err
 	}
@@ -313,7 +326,7 @@ func (w workshopDB) GetSignUpsByWorkshopID(workshopID string) ([]workshop.SignUp
 	var id int
 	for rows.Next() {
 		var s workshop.SignUp
-		if err := rows.Scan(&id, &s.WorkshopID, &s.FirstName, &s.LastName, &s.Email, &s.CreatedAt, &s.UpdatedAt); err != nil {
+		if err := rows.Scan(&id, &s.WorkshopID, &s.FirstName, &s.LastName, &s.Email, &s.CreatedAt, &s.UpdatedAt, &s.Message); err != nil {
 			return signups, err
 		}
 		signups = append(signups, s)
@@ -336,4 +349,52 @@ func (w workshopDB) GetNumSignUpsByWorkshopID(workshopID string) (int, error) {
 
 	}
 	return count, nil
+}
+
+func (w workshopDB) GetAllSignUps() ([]workshop.SignUpTable, error) {
+	var table []workshop.SignUpTable
+	wNames, err := w.getWorkshopNames()
+	if err != nil {
+		return table, err
+	}
+	for _, n := range wNames {
+		sups, err := w.GetSignUpsByWorkshopID(n.ID)
+		if err != nil {
+			return table, err
+		}
+		table = append(table, workshop.SignUpTable{
+			WorkshopName: n.Name,
+			SignUps:      sups,
+		})
+
+	}
+	return table, nil
+
+}
+
+type workshopName struct {
+	ID   string
+	Name string
+}
+
+func (w workshopDB) getWorkshopNames() ([]workshopName, error) {
+
+	sqlCmd := "SELECT workshop_id, name FROM workshops"
+	var (
+		id     string
+		name   string
+		wNames []workshopName
+	)
+	rows, err := w.db.Query(sqlCmd)
+	if err != nil {
+		return wNames, err
+	}
+	for rows.Next() {
+		if err := rows.Scan(&id, &name); err != nil {
+			return wNames, err
+		}
+		wNames = append(wNames, workshopName{ID: id, Name: name})
+	}
+	return wNames, nil
+
 }

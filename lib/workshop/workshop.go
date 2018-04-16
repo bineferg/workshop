@@ -32,8 +32,14 @@ type SignUp struct {
 	FirstName  string
 	LastName   string
 	Email      string
+	Message string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+}
+
+type SignUpTable struct {
+	WorkshopName string
+	SignUps      []SignUp
 }
 
 func (w Workshop) New() Workshop {
