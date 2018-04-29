@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -301,14 +302,16 @@ func (w workshopDB) GetEventsAfterDate(date time.Time) ([]workshop.Event, error)
 }
 
 func (w workshopDB) SignUp(signup workshop.SignUp) error {
-	sqlCmd := "INSERT INTO signups (workshop_id, first_name, last_name, email, message, created_at, updated_at) VALUES(?, ?, ?, ?,?, NOW(), NOW())"
+	log.Println(signup.WorkshopID)
+	log.Println(signup.FirstName)
+	log.Println(signup.LastName)
+	sqlCmd := "INSERT INTO signups (workshop_id, first_name, last_name, email, created_at, updated_at) VALUES(?, ?, ?, ?, NOW(), NOW())"
 	if _, err := w.db.Exec(
 		sqlCmd,
 		signup.WorkshopID,
 		signup.FirstName,
 		signup.LastName,
 		signup.Email,
-		signup.Message,
 	); err != nil {
 		return err
 	}
@@ -326,7 +329,7 @@ func (w workshopDB) GetSignUpsByWorkshopID(workshopID string) ([]workshop.SignUp
 	var id int
 	for rows.Next() {
 		var s workshop.SignUp
-		if err := rows.Scan(&id, &s.WorkshopID, &s.FirstName, &s.LastName, &s.Email, &s.CreatedAt, &s.UpdatedAt, &s.Message); err != nil {
+		if err := rows.Scan(&id, &s.WorkshopID, &s.FirstName, &s.LastName, &s.Email, &s.CreatedAt, &s.UpdatedAt); err != nil {
 			return signups, err
 		}
 		signups = append(signups, s)

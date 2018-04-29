@@ -21,11 +21,11 @@ local-workshop:
 
 deploy:
 	aws deploy create-deployment \
-  --application-name Workshop \
-  --deployment-config-name CodeDeployDefault.OneAtATime \
-  --deployment-group-name Workshop-DepGrp \
-  --description "Backend Website" \
-  --github-location repository=repository,commitId=$(VERSION)
+  		--application-name Workshop \
+  	--deployment-config-name CodeDeployDefault.OneAtATime \
+  	--deployment-group-name Workshop-DepGrp \
+  	--description "Backend Website" \
+  	--github-location repository=repository,commitId=$(VERSION)
 
 clean:
 	rm server
