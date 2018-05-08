@@ -75,7 +75,7 @@ func main() {
 	router.Handle("/workshops", workshopHandler)
 	router.Handle("/signup/{workshop_id}", signupHandler)
 	router.Handle("/mail", mailHandler)
-	router.HandleFunc("/upload/{key}", uploadHandler.SignURL)
+	router.HandleFunc("/upload/{folder}/{key}", uploadHandler.SignURL)
 	log.Printf("listening on port %s", *port)
 	go func() {
 		if err := http.ListenAndServe(":"+*port, handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS", "DELETE"}), handlers.AllowedOrigins([]string{"*"}))(router)); err != nil {

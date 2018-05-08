@@ -32,7 +32,7 @@ type SignUp struct {
 	FirstName  string
 	LastName   string
 	Email      string
-	Message string
+	Message    string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }

@@ -329,7 +329,7 @@ func (w workshopDB) GetSignUpsByWorkshopID(workshopID string) ([]workshop.SignUp
 	var id int
 	for rows.Next() {
 		var s workshop.SignUp
-		if err := rows.Scan(&id, &s.WorkshopID, &s.FirstName, &s.LastName, &s.Email, &s.CreatedAt, &s.UpdatedAt); err != nil {
+		if err := rows.Scan(&id, &s.WorkshopID, &s.FirstName, &s.LastName, &s.Email, &s.CreatedAt, &s.UpdatedAt, &s.Message); err != nil {
 			return signups, err
 		}
 		signups = append(signups, s)

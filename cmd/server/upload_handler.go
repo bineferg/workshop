@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -19,11 +20,17 @@ type URLResponse struct {
 	URL string `json:"url"`
 }
 
+const (
+	workshopsFolder = "workshops"
+	eventsFodler    = "events"
+)
+
 func (u UploadHandler) SignURL(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["key"]
+	folder := vars["folder"]
 	req, _ := u.s3Cli.PutObjectRequest(&s3.PutObjectInput{
-		Bucket: aws.String(u.bucket),
+		Bucket: aws.String(fmt.Sprintf("%s/%s", u.bucket, folder)),
 		Key:    aws.String(key),
 	})
 	str, err := req.Presign(15 * time.Minute)
