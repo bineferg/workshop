@@ -1,0 +1,10 @@
+INSERT INTO workshop.signups VALUES(1, 'jaEhwbpf83', 'Jane', 'Doe', 'jane.doe@gmail.com', '14-12-12 21:49:43', '14-12-12 22:49:53');
+INSERT INTO workshop.signups VALUES(2, 'jaEhwbpf83', 'Sam', 'Doe', 'sam.doe@gmail.com', '14-12-12 21:49:43', '14-12-12 22:49:53');
+INSERT INTO workshop.signups VALUES(3, 'jaEqkerjbpf83', 'Sally', 'Doe', 'sally.doe@gmail.com', '14-12-12 21:49:43', '14-12-12 22:49:53');
+INSERT INTO workshop.signups VALUES(4, 'jaEhwbpf83', 'Missy', 'Doe', 'missy.doe@gmail.com', '14-12-12 21:49:43', '14-12-12 22:49:53');
+INSERT INTO workshop.signups VALUES(5, '111hwbpf83', 'Kilo', 'Doe', 'kilo.doe@gmail.com', '14-12-12 21:49:43', '14-12-12 22:49:53');
+INSERT INTO workshop.signups VALUES(6, '111hwbpf83', 'Mary', 'Doe', 'mary.doe@gmail.com', '14-12-12 21:49:43', '14-12-12 22:49:53');
+INSERT INTO workshop.signups VALUES(7, 'jaEhwbpf83', 'Forrest', 'Doe', 'forrest.doe@gmail.com', '14-12-12 21:49:43', '14-12-12 22:49:53');
+INSERT INTO workshop.signups VALUES(8, 'jaEhwbpf83', 'April', 'Doe', 'april.doe@gmail.com', '14-12-12 21:49:43', '14-12-12 22:49:53');
+INSERT INTO workshop.signups VALUES(9, 'jaEhwbpf83', 'None', 'Doe', 'none.doe@gmail.com', '14-12-12 21:49:43', '14-12-12 22:49:53');
+INSERT INTO workshop.signups VALUES(10, 'jaEhwbpf83', 'Miri', 'Doe', 'miri.doe@gmail.com', '14-12-12 21:49:43', '14-12-12 22:49:53');
