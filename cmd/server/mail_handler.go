@@ -28,8 +28,13 @@ func (h MailHandler) SendMail(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
+
+	if mr.Message == "" {
+		mr.Message = "(no message)"
+	}
+
 	defer r.Body.Close()
-	emailBody := fmt.Sprintf("Message: %s\r\n\tSent By: %s %s %s", mr.Message, mr.FirstName, mr.LastName, mr.Email)
+	emailBody := fmt.Sprintf("Sent By: %s %s\n Email: %s\n Message: %s\n", mr.FirstName, mr.LastName, mr.Email, mr.Message)
 	sesEmailInput := &ses.SendEmailInput{
 		Destination: &ses.Destination{
 			ToAddresses: []*string{aws.String(recipient)},
