@@ -17,7 +17,8 @@ type MailRequest struct {
 	Email     string `json:"Email"`
 	FirstName string `json:"FirstName"`
 	LastName  string `json:"LastName"`
-	Message   string `json"Message"`
+	Message   string `json:"Message"`
+	Subject   string `json:"Subject"`
 }
 
 func (h MailHandler) SendMail(w http.ResponseWriter, r *http.Request) error {
@@ -29,12 +30,12 @@ func (h MailHandler) SendMail(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	if mr.Message == "" {
-		mr.Message = "(no message)"
-	}
-
 	defer r.Body.Close()
-	emailBody := fmt.Sprintf("Sent By: %s %s\n Email: %s\n Message: %s\n", mr.FirstName, mr.LastName, mr.Email, mr.Message)
+	emailBody := fmt.Sprintf("Sent By: %s %s\n Email: %s\n", mr.FirstName, mr.LastName, mr.Email)
+
+	if mr.Message != "" {
+		emailBody = fmt.Sprintf("%s\n\n Message: %s", emailBody, mr.Message)
+	}
 	sesEmailInput := &ses.SendEmailInput{
 		Destination: &ses.Destination{
 			ToAddresses: []*string{aws.String(recipient)},
@@ -45,7 +46,7 @@ func (h MailHandler) SendMail(w http.ResponseWriter, r *http.Request) error {
 					Data: aws.String(emailBody)},
 			},
 			Subject: &ses.Content{
-				Data: aws.String("Workshop-Web Email"),
+				Data: aws.String(mr.Subject),
 			},
 		},
 		Source: aws.String(from),
